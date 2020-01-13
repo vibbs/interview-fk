@@ -4,7 +4,7 @@ from flask import Flask, jsonify, Request, request, Response
 
 
 
-from models import User, Post, Reactions
+from models import User, Post, Reactions, Comments
 
 CURRENT_USER = None
 
@@ -148,16 +148,16 @@ def post_comment(id):
 
                 req_data = request.get_json()
                 try:
-                    new_post_obj = Post(
+                    new_comment_obj = Comments(
                         id=LATEST_POST_ID,
                         content=req_data['content'],
-                        created_by=CURRENT_USER.id)
+                        created_by=CURRENT_USER.id,
+                        commented_on=id)
 
-                    POST_LIST.append(new_post_obj)
 
                     LATEST_POST_ID += 1
 
-                    post.add_comment(new_post_obj)
+                    post.add_comment(new_comment_obj)
                     return jsonify({'status': 'ok'})
                 except AttributeError as ae:
                     return jsonify({'status': 'failed', 'message': 'No user logged in'})

@@ -103,3 +103,28 @@ class Post:
             'reactions' : self.reactions,
             'comments' : [e.serialize() for e in self.comments],
         }
+
+
+
+
+class Comments(Post):
+
+    commented_on = None
+
+
+    def __init__(self, id, content, created_by, commented_on):
+        self.id = id
+        self.content = content
+        self.created_by = created_by  # This is the user id
+        self.created_on = datetime.now()
+        self.reactions = {}
+        self.commented_on = commented_on
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'content' : self.content,
+            'created_by' : self.created_by,
+            'created_on' : self.created_on,
+            'reactions' : self.reactions
+        }
