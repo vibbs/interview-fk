@@ -65,8 +65,7 @@ class Post:
         self.id = id
         self.content = content
         self.created_by = created_by # This is the user id
-
-        # TODO externalize this to ENUM class
+        self.created_on = datetime.now()
         self.reactions = {}
 
         self.comments = []
@@ -89,7 +88,7 @@ class Post:
 
     def add_comment(self, comment):
 
-        if isinstance(comment, Post):
+        if not isinstance(comment, Post):
             return False
 
         self.comments.append(comment)
@@ -102,5 +101,5 @@ class Post:
             'created_by' : self.created_by,
             'created_on' : self.created_on,
             'reactions' : self.reactions,
-            'comments' : self.comments,
+            'comments' : [e.serialize() for e in self.comments],
         }

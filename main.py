@@ -22,6 +22,8 @@ app = Flask(__name__)
 def hello():
     return "Hello World!"
 
+# TODO: signup seperation
+
 
 @app.route("/users/login/<id>")
 def login(id):
@@ -40,7 +42,6 @@ def login(id):
 def user_controller():
     global LATEST_USER_ID
     global USER_LIST
-
 
 
     if request.method == 'POST':
@@ -105,17 +106,38 @@ def post_controller():
 
 
 @app.route("/posts/<id>/reaction/<reaction>", methods=['GET'])
-def post_controller(id, reaction):
+def post_reaction(id, reaction):
     global POST_LIST
     id = int(id)
 
     for post in POST_LIST:
         if id == post.id:
             post.add_reaction(reaction_type = reaction)
+            return jsonify({'status': 'ok'})
+
+    return jsonify({'status': 'failed'})
+
+@app.route("/news_feed", methods=['GET'])
+def news_feed():
+    global POST_LIST
+    filtered_post_list = []
+    if not CURRENT_USER:
+        return jsonify({'status': 'failed', 'message': 'no logged in user'})
+
+    for user_ids in CURRENT_USER.follows:
+        for post in POST_LIST:
+            if user_ids == post.created_by:
+                filtered_post_list.append(post)
+
+    # Sorting based on the time and number of comments
+
+    response = sorted(filtered_post_list, key=lambda post: (post.created_on, post.comments))
+
+    return jsonify([e.serialize() for e in response])
 
 
 @app.route("/posts/<id>/comment/", methods=['POST'])
-def post_controller(id):
+def post_comment(id):
     global POST_LIST
     global LATEST_POST_ID
     id = int(id)
